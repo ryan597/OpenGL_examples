@@ -65,10 +65,14 @@ auto main() -> int
     glBindVertexArray(VertexArrayID);
 
     // create and compile the GLSL program from the shaders
-    GLuint programID = LoadShaders("../SimpleVertexShader.vertexshader", "../SimpleFragmentShader.fragmentshader");
+    std::string vertexShaderSource = loadShaderSource("../SimpleVertexShader.vertexshader");
+    std::string fragmentShaderSource = loadShaderSource("../SimpleFragmentShader.fragmentshader");
+    unsigned int programID = createShaders(vertexShaderSource, fragmentShaderSource);
+
+    //unsigned int programID = LoadShaders("../SimpleVertexShader.vertexshader", "../SimpleFragmentShader.fragmentshader");
 
     // check if shaders could load
-    if (programID == (GLuint)-1)
+    if (programID == (unsigned int)-1)
     {
         glfwTerminate();
         //std::getchar();

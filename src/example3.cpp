@@ -64,10 +64,12 @@ auto main() -> int
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
-    GLuint programID = LoadShaders( "../SimpleTransform.vertexshader", "../SingleColor.fragmentshader" );
+    const std::string vertexShaderSource = loadShaderSource( "../SimpleTransform.vertexshader");
+    const std::string fragmentShaderSource = loadShaderSource("../SingleColor.fragmentshader");
+    unsigned int programID = createShaders(vertexShaderSource, fragmentShaderSource);
 
     // check if shaders could load
-    if (programID == (GLuint)-1)
+    if (programID == (unsigned int)-1)
     {
         glfwTerminate();
         //std::getchar();
