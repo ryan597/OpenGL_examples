@@ -4,7 +4,7 @@ project('glXample', 'cpp',
                     'cpp_std=c++2a',
                     'warning_level=3'])
 
-include = include_directories('include')
+include = include_directories('../include')
 
 opengl_dep = dependency('OpenGL', required: true)
 glfw_dep = dependency('glfw3', required: false)
@@ -25,9 +25,13 @@ endif
 
 GL_dep = [opengl_dep, glfw_dep, glew_dep, thread_dep]
 
-sources = ['example1.cpp']
+sources_ex1 = ['example1.cpp']
+sources_ex2 = ['example2.cpp', 'shader.cpp']
 
-programs = [['GL_example', sources]]
+
+programs = [['example1', sources_ex1],
+            ['example2', sources_ex2],
+           ]
 
 
 foreach p: programs
