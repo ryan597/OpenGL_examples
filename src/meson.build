@@ -27,10 +27,12 @@ GL_dep = [opengl_dep, glfw_dep, glew_dep, thread_dep]
 
 sources_ex1 = ['example1.cpp']
 sources_ex2 = ['example2.cpp', 'shader.cpp']
+sources_ex3 = ['example3.cpp', 'shader.cpp']
 
 
 programs = [['example1', sources_ex1],
             ['example2', sources_ex2],
+            ['example3', sources_ex3]
            ]
 
 
