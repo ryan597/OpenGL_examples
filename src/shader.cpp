@@ -1,14 +1,82 @@
 #include <iostream>
-#include <string>
-#include <vector>
 #include <fstream>
-#include <algorithm>
 #include <sstream>
+
+#include <vector>
 
 #include <GL/glew.h>
 
 #include "shader.h"
 
+
+auto loadShaderSource(const std::string& shaderFile) -> std::string
+{
+    std::string shaderSource;
+    std::ifstream shaderStream(shaderFile, std::ios::in);
+    if (shaderStream.is_open())
+    {
+        std::stringstream sstr;
+        sstr << shaderStream.rdbuf();
+        shaderSource = sstr.str();
+        shaderStream.close();
+    }
+    else {
+        std::cout << "Cannot open " << shaderFile << '\n';
+        return "";
+    }
+
+    return shaderSource;
+}
+
+auto compileShader(unsigned int type, const std::string& source) -> unsigned int
+{
+    unsigned int id = glCreateShader(type);
+    const char* src = source.c_str();
+
+    std::cout << "Compiling " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader\n";
+    glShaderSource(id, 1, &src, nullptr);
+    glCompileShader(id);
+
+    int result;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    if (result == GL_FALSE)
+    {
+        int length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        char* message = (char*)alloca(length * sizeof(char));
+        glGetShaderInfoLog(id, length, &length, message);
+        std::cout << "Failed to compile: "
+                  << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << "shader\n"
+                  << message << '\n';
+        glDeleteShader(id);
+        return -1;
+    }
+    return id;
+}
+
+auto createShaders(const std::string& vertexShaderSource, const std::string& fragmentShaderSource) -> unsigned int
+{
+    unsigned int program = glCreateProgram();
+    unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
+    unsigned int fs = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+
+    std::cout << "Linking program\n";
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    glDetachShader(program, vs);
+    glDetachShader(program, fs);
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    return program;
+}
+
+/*
 auto LoadShaders(const char* vertex_file_path, const char* fragment_file_path) -> GLuint
 {
     // create shaders
@@ -105,3 +173,4 @@ auto LoadShaders(const char* vertex_file_path, const char* fragment_file_path) -
 
     return ProgramID;
 }
+*/
