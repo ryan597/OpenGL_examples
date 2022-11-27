@@ -1,6 +1,5 @@
 // Include standard headers
 #include <iostream>
-#include <cstdlib>
 
 // Include GLEW. Always include it before gl.h and glfw3.h, since it's a bit magic.
 #include <GL/glew.h>
@@ -10,9 +9,10 @@
 
 // Include GLM
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-#include "shader.h"
+#include "../shader.h"
 
 auto main() -> int
 {
@@ -57,19 +57,16 @@ auto main() -> int
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
     // ************************************************************************
-    // EXAMPLE 2  EXAMPLE 2  EXAMPLE 2  EXAMPLE 2  EXAMPLE 2  EXAMPLE 2
+    // EXAMPLE 3  EXAMPLE 3  EXAMPLE 3  EXAMPLE 3  EXAMPLE 3  EXAMPLE 3
     // ************************************************************************
 
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
-    // create and compile the GLSL program from the shaders
-    std::string vertexShaderSource = loadShaderSource("../SimpleVertexShader.vertexshader");
-    std::string fragmentShaderSource = loadShaderSource("../SimpleFragmentShader.fragmentshader");
+    const std::string vertexShaderSource = loadShaderSource( "../ex3/SimpleTransform.vertexshader");
+    const std::string fragmentShaderSource = loadShaderSource("../ex3/SingleColor.fragmentshader");
     unsigned int programID = createShaders(vertexShaderSource, fragmentShaderSource);
-
-    //unsigned int programID = LoadShaders("../SimpleVertexShader.vertexshader", "../SimpleFragmentShader.fragmentshader");
 
     // check if shaders could load
     if (programID == (unsigned int)-1)
@@ -79,10 +76,26 @@ auto main() -> int
         return -1;
     }
 
+    GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+
+    glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+    //glm::mat4 Projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.0f, 100.0f); // In world coordinates
+
+    glm::mat4 View = glm::lookAt(
+        glm::vec3(4, 3, 3),  // camera is at (4, 3, 3)
+        glm::vec3(0, 0, 0),  // looking at the origin
+        glm::vec3(0, 1, 0)   // head is up (set to (0, -1, 0) for upside down)
+    );
+
+    // model matrix : identity matrix (will be at origin)
+    glm::mat4 Model = glm::mat4(1.0f);
+    // model view projection
+    glm::mat4 MVP = Projection * View * Model;
+
     static const GLfloat g_vertex_buffer_data[] = {
         -1.0f, -1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,
-         0.0f,  1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        0.0f,  1.0f, 0.0f,
     };
 
     GLuint vertexbuffer;
@@ -94,22 +107,24 @@ auto main() -> int
         // Clear the screen
         glClear( GL_COLOR_BUFFER_BIT );
 
-        // use the shader
         glUseProgram(programID);
+
+        // send transformation to the bound shader
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
-            0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-            3,                  // size
-            GL_FLOAT,           // type
-            GL_FALSE,           // normalized?
-            0,                  // stride
-            (void*)nullptr      // array buffer offset
+            0,
+            3,
+            GL_FLOAT,
+            GL_FALSE,
+            0,
+            (void*)nullptr
         );
 
-        // draw triangle
-        glDrawArrays(GL_TRIANGLES, 0, 3);  // 3 indices starting at 0 -> 1 triangle
+        // draw
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glDisableVertexAttribArray(0);
 

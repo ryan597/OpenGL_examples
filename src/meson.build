@@ -25,14 +25,17 @@ endif
 
 GL_dep = [opengl_dep, glfw_dep, glew_dep, thread_dep]
 
-sources_ex1 = ['example1.cpp']
-sources_ex2 = ['example2.cpp', 'shader.cpp']
-sources_ex3 = ['example3.cpp', 'shader.cpp']
-
+sources_ex1 = ['ex1/example1.cpp']
+sources_ex2 = ['ex2/example2.cpp', 'shader.cpp']
+sources_ex3 = ['ex3/example3.cpp', 'shader.cpp']
+sources_ex4 = ['ex4/example4.cpp', 'shader.cpp']
+sources_ex5 = ['ex5/example5.cpp', 'shader.cpp', 'texture.cpp']
 
 programs = [['example1', sources_ex1],
             ['example2', sources_ex2],
-            ['example3', sources_ex3]
+            ['example3', sources_ex3],
+            ['example4', sources_ex4],
+            ['example5', sources_ex5]
            ]
 
 
